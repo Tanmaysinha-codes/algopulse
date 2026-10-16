@@ -40,6 +40,16 @@ export function serializeStateToUrl(state: Partial<AppState>) {
   const params = new URLSearchParams(window.location.search);
   if (state.mode) params.set('mode', state.mode);
   if (state.algorithmId) params.set('algo', state.algorithmId);
+
+  // Only persist race params if explicitly active
+  if (state.isRaceMode) {
+    params.set('race', '1');
+    if (state.algorithmIdB) params.set('algoB', state.algorithmIdB);
+  } else {
+    params.delete('race');
+    params.delete('algoB');
+  }
+
   if (state.stepsPerSecond) params.set('speed', state.stepsPerSecond.toString());
   if (state.arraySize) params.set('size', state.arraySize.toString());
   if (state.diagonalEnabled !== undefined) params.set('diag', state.diagonalEnabled ? '1' : '0');
@@ -55,7 +65,8 @@ export function serializeStateToUrl(state: Partial<AppState>) {
     params.delete('grid');
   }
   
-  const newUrl = `${window.location.pathname}?${params.toString()}`;
+  const query = params.toString();
+  const newUrl = query ? `${window.location.pathname}?${query}` : window.location.pathname;
   window.history.replaceState({}, '', newUrl);
 }
 
@@ -65,6 +76,11 @@ export function deserializeStateFromUrl(): Partial<AppState> {
 
   if (params.has('mode')) state.mode = params.get('mode') as AppMode;
   if (params.has('algo')) state.algorithmId = params.get('algo') as AlgorithmId;
+  if (params.has('algoB')) state.algorithmIdB = params.get('algoB') as AlgorithmId;
+  
+  // Default is always Single Algorithm mode unless ?race=1 is explicitly in URL
+  state.isRaceMode = params.get('race') === '1';
+
   if (params.has('speed')) state.stepsPerSecond = Number(params.get('speed')) as SpeedPreset;
   if (params.has('size')) state.arraySize = Number(params.get('size'));
   if (params.has('diag')) state.diagonalEnabled = params.get('diag') === '1';

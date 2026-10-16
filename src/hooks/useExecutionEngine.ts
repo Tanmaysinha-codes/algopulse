@@ -172,6 +172,17 @@ export function useExecutionEngine(stepsPerSecond: number, onTonePlay?: (entry: 
     return false;
   }, []);
 
+  const seekTo = useCallback((index: number) => {
+    const clamped = Math.max(0, Math.min(index, historyRef.current.length - 1));
+    const delta = clamped - currentIndexRef.current;
+    currentIndexRef.current = clamped;
+    setCurrentIndex(clamped);
+    if (delta > 0) {
+      producerRef.current?.ack(delta);
+      fillBuffer();
+    }
+  }, [fillBuffer]);
+
   useEffect(() => {
     if (!isPlaying) {
       lastFrameTimeRef.current = 0;
@@ -242,6 +253,7 @@ export function useExecutionEngine(stepsPerSecond: number, onTonePlay?: (entry: 
     pause: () => setIsPlaying(false),
     stepForward,
     stepBackward,
+    seekTo,
     start,
     reset
   };
