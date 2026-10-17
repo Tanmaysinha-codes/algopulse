@@ -3,6 +3,7 @@ import { AppContext } from './AppContextValue';
 import { AlgorithmId } from '../types/registry';
 import { SpeedPreset, GRID_ROWS, GRID_COLS } from '../utils/constants';
 import { generateMaze, generatePresetMap, MapPresetType } from '../features/pathfinding/mazeAlgos';
+import { ArrayDistribution } from '../features/sorting/arrayGenerators';
 import { serializeStateToUrl, deserializeStateFromUrl } from '../utils/urlState';
 
 export type AppMode = 'sorting' | 'pathfinding';
@@ -17,6 +18,8 @@ export interface AppState {
   isRaceMode: boolean;
   stepsPerSecond: SpeedPreset;
   arraySize: number;
+  distribution: ArrayDistribution;
+  customArray: number[];
   diagonalEnabled: boolean;
   activeTool: Tool;
   brushSize: BrushSize;
@@ -36,6 +39,8 @@ export type Action =
   | { type: 'TOGGLE_RACE_MODE'; payload: boolean }
   | { type: 'SET_SPEED'; payload: SpeedPreset }
   | { type: 'SET_ARRAY_SIZE'; payload: number }
+  | { type: 'SET_DISTRIBUTION'; payload: ArrayDistribution }
+  | { type: 'SET_CUSTOM_ARRAY'; payload: number[] }
   | { type: 'TOGGLE_DIAGONAL'; payload: boolean }
   | { type: 'SET_TOOL'; payload: Tool }
   | { type: 'SET_BRUSH_SIZE'; payload: BrushSize }
@@ -67,6 +72,8 @@ const defaultState: AppState = {
   isRaceMode: false,
   stepsPerSecond: 20,
   arraySize: 50,
+  distribution: 'random',
+  customArray: [],
   diagonalEnabled: false,
   activeTool: 'wall',
   brushSize: 1,
@@ -98,6 +105,14 @@ function reducer(state: AppState, action: Action): AppState {
     case 'TOGGLE_RACE_MODE': return { ...state, isRaceMode: action.payload };
     case 'SET_SPEED': return { ...state, stepsPerSecond: action.payload };
     case 'SET_ARRAY_SIZE': return { ...state, arraySize: action.payload };
+    case 'SET_DISTRIBUTION': return { ...state, distribution: action.payload };
+    case 'SET_CUSTOM_ARRAY': 
+      return { 
+        ...state, 
+        distribution: 'custom', 
+        customArray: action.payload, 
+        arraySize: action.payload.length 
+      };
     case 'TOGGLE_DIAGONAL': return { ...state, diagonalEnabled: action.payload };
     case 'SET_TOOL': return { ...state, activeTool: action.payload };
     case 'SET_BRUSH_SIZE': return { ...state, brushSize: action.payload };

@@ -12,8 +12,8 @@ import { PathGrid } from './features/pathfinding/PathGrid';
 import { useExecutionEngine, SyncProducer, WorkerProducer, EngineProducer } from './hooks/useExecutionEngine';
 import { useAudio } from './hooks/useAudio';
 import { generateSort } from './features/sorting/sortingAlgos';
+import { generateArray } from './features/sorting/arrayGenerators';
 import { generatePath } from './features/pathfinding/pathAlgos';
-import { RNG } from './utils/rng';
 import { PathStepEvent, HistoryEntry } from './types/steps';
 import { AlertCircle } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -48,8 +48,7 @@ function AlgoPulseApp() {
     finishTimeRef.current = {};
 
     if (state.mode === 'sorting') {
-      const rng = new RNG(state.seed);
-      const arr = Array.from({ length: state.arraySize }, () => rng.nextInt(1, state.arraySize + 1));
+      const arr = generateArray(state.distribution, state.arraySize, state.seed, state.customArray);
       return new SyncProducer(generateSort(state.algorithmId, arr));
     } else {
       if (workerFailedA) {
@@ -65,12 +64,11 @@ function AlgoPulseApp() {
         diagonalEnabled: state.diagonalEnabled
       }, () => setWorkerFailedA(true));
     }
-  }, [state.mode, state.algorithmId, state.arraySize, state.seed, state.startNode, state.targetNode, state.gridMap, state.diagonalEnabled, workerFailedA, setWorkerFailedA]);
+  }, [state.mode, state.algorithmId, state.arraySize, state.distribution, state.customArray, state.seed, state.startNode, state.targetNode, state.gridMap, state.diagonalEnabled, workerFailedA, setWorkerFailedA]);
 
   const generatorFactoryB = useCallback((): EngineProducer => {
     if (state.mode === 'sorting') {
-      const rng = new RNG(state.seed); // exact same seed ensures identical array!
-      const arr = Array.from({ length: state.arraySize }, () => rng.nextInt(1, state.arraySize + 1));
+      const arr = generateArray(state.distribution, state.arraySize, state.seed, state.customArray);
       return new SyncProducer(generateSort(state.algorithmIdB, arr));
     } else {
       if (workerFailedB) {
@@ -86,7 +84,7 @@ function AlgoPulseApp() {
         diagonalEnabled: state.diagonalEnabled
       }, () => setWorkerFailedB(true));
     }
-  }, [state.mode, state.algorithmIdB, state.arraySize, state.seed, state.startNode, state.targetNode, state.gridMap, state.diagonalEnabled, workerFailedB, setWorkerFailedB]);
+  }, [state.mode, state.algorithmIdB, state.arraySize, state.distribution, state.customArray, state.seed, state.startNode, state.targetNode, state.gridMap, state.diagonalEnabled, workerFailedB, setWorkerFailedB]);
 
   // Initialize Engine A
   useEffect(() => {

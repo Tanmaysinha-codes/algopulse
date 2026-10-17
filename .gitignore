@@ -1,4 +1,47 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Dependencies & Build Output
 node_modules/
 dist/
+dist-ssr/
+*.local
+
+# Environment Variables & Secrets (Prevent API Key / Token Leaks)
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 .env.*
+!.env.example
+
+# Certificates & Private Keys
+*.pem
+*.key
+*.cert
+*.crt
+id_rsa*
+id_ed25519*
+
+# Caches
+.eslintcache
+.turbo
+*.tsbuildinfo
+
+# OS Metadata
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+
+# IDE / Editor configuration
+.idea/
+*.swp
+*.swo

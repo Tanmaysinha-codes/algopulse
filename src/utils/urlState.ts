@@ -1,6 +1,7 @@
 import { AppState, AppMode } from '../contexts/AppContext';
 import { AlgorithmId } from '../types/registry';
 import { SpeedPreset, GRID_ROWS, GRID_COLS } from './constants';
+import { ArrayDistribution } from '../features/sorting/arrayGenerators';
 
 function encodeGrid(grid: number[]): string {
   if (!grid || grid.length === 0) return '';
@@ -52,6 +53,12 @@ export function serializeStateToUrl(state: Partial<AppState>) {
 
   if (state.stepsPerSecond) params.set('speed', state.stepsPerSecond.toString());
   if (state.arraySize) params.set('size', state.arraySize.toString());
+  if (state.mode === 'sorting' && state.distribution && state.distribution !== 'random') {
+    params.set('dist', state.distribution);
+  } else {
+    params.delete('dist');
+  }
+
   if (state.diagonalEnabled !== undefined) params.set('diag', state.diagonalEnabled ? '1' : '0');
   if (state.seed) params.set('seed', state.seed.toString());
   
@@ -83,6 +90,7 @@ export function deserializeStateFromUrl(): Partial<AppState> {
 
   if (params.has('speed')) state.stepsPerSecond = Number(params.get('speed')) as SpeedPreset;
   if (params.has('size')) state.arraySize = Number(params.get('size'));
+  if (params.has('dist')) state.distribution = params.get('dist') as ArrayDistribution;
   if (params.has('diag')) state.diagonalEnabled = params.get('diag') === '1';
   if (params.has('seed')) state.seed = Number(params.get('seed'));
 

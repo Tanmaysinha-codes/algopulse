@@ -1,5 +1,8 @@
 import { memo } from 'react';
 import { SortStepEvent } from '../../types/steps';
+import { useAppContext } from '../../contexts/AppContextValue';
+import { ARRAY_PRESET_OPTIONS } from './arrayGenerators';
+import { Sparkles } from 'lucide-react';
 
 interface SortingBoardProps {
   entry: SortStepEvent | null;
@@ -22,6 +25,9 @@ const Bar = memo(({ value, maxVal, stateClass, showLabel }: { value: number, max
 });
 
 export function SortingBoard({ entry }: SortingBoardProps) {
+  const { state } = useAppContext();
+  const preset = ARRAY_PRESET_OPTIONS.find(p => p.id === state.distribution);
+
   if (!entry) return null;
   const { array, sorted } = entry;
   const step = entry.type === 'SORT_STEP' ? entry : null;
@@ -30,9 +36,9 @@ export function SortingBoard({ entry }: SortingBoardProps) {
 
   return (
     <div className="flex-1 flex flex-col bg-slate-50 dark:bg-slate-950 bg-canvas-grid relative overflow-hidden p-2 sm:p-6">
-      {/* Legend Pill */}
+      {/* Legend & Distribution Header */}
       <div className="shrink-0 flex flex-wrap items-center justify-between gap-2 mb-2 sm:mb-4 px-2">
-        <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-[11px] font-medium text-slate-600 dark:text-slate-400 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xs px-3 py-1.5 rounded-xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs">
+        <div className="flex flex-wrap items-center gap-2.5 sm:gap-4 text-[11px] font-medium text-slate-600 dark:text-slate-400 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xs px-3 py-1.5 rounded-xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs">
           <span className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-xs bg-indigo-500/80 dark:bg-indigo-400/80 inline-block" /> Default
           </span>
@@ -49,6 +55,29 @@ export function SortingBoard({ entry }: SortingBoardProps) {
             <span className="w-2.5 h-2.5 rounded-xs bg-emerald-500 inline-block" /> Sorted
           </span>
         </div>
+
+        {preset && (
+          <div className="flex items-center gap-2 text-[11px] bg-white/80 dark:bg-slate-900/80 backdrop-blur-xs px-3 py-1.5 rounded-xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs text-slate-600 dark:text-slate-300">
+            <span className="font-semibold text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
+              <Sparkles size={12} className="shrink-0 text-amber-500" />
+              <span className="hidden xs:inline">Pattern:</span>
+              <span className="text-slate-800 dark:text-slate-200">{preset.label.split('(')[0].trim()}</span>
+            </span>
+            {preset.badge && (
+              <span className="hidden sm:inline-block px-1.5 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 font-semibold text-[10px] border border-amber-500/20">
+                {preset.badge}
+              </span>
+            )}
+            {!state.isRaceMode && (
+              <>
+                <span className="hidden lg:inline text-slate-400 dark:text-slate-500">•</span>
+                <span className="hidden lg:inline text-slate-500 dark:text-slate-400 italic max-w-sm truncate" title={preset.hint}>
+                  {preset.hint}
+                </span>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Main Chart Card */}
